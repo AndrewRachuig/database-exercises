@@ -29,6 +29,16 @@ SELECT name, release_date FROM albums WHERE release_date > 1989 and release_date
 SELECT name, sales FROM albums WHERE sales < 20;
 
 -- f. All the albums with a genre of "Rock". 
-SELECT name, genre FROM albums WHERE genre LIKE '%Rock%';
+SELECT 
+    name, genre
+FROM
+    albums
+WHERE
+    genre LIKE '%Rock%'
+        AND genre NOT LIKE 'Hard rock'
+        AND genre NOT LIKE '%Alternative rock%'
+        AND genre NOT LIKE '%Progressive rock%'
+        AND genre NOT LIKE '%Soft rock%'
+        AND genre NOT LIKE '%Folk rock%';
 -- Why do these query results not include albums with a genre of "Hard rock" or "Progressive rock"?
--- Because "Hard rock" and "Progressive rock" are separate 
+-- Because "Hard rock" and "Progressive rock" are separate genre
