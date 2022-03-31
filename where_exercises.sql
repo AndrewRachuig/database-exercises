@@ -1,4 +1,5 @@
 use employees;
+SELECT database();
 
 -- 2. Find all current or previous employees with first names 'Irena', 'Vidya', or 'Maya' using IN. Enter a comment with the number of records returned.
 SELECT 
