@@ -1,4 +1,5 @@
 use employees;
+SELECT Database();
 
 -- 2. Find all employees with first names 'Irena', 'Vidya', or 'Maya', and order your results returned by first name. 
 SELECT 
@@ -48,7 +49,7 @@ SELECT
 FROM
     employees
 WHERE
-    last_name LIKE 'E%e'
+    last_name LIKE 'E%E'
 ORDER BY emp_no;
 
 -- Enter a comment with the number of employees returned, the first employee number and their first and last name, and the last employee number with their first and last name.
@@ -60,7 +61,7 @@ SELECT
 FROM
     employees
 WHERE
-    last_name LIKE 'E%e'
+    last_name LIKE 'E%E'
 ORDER BY hire_date DESC;
 
 -- Enter a comment with the number of employees returned, the name of the newest employee, and the name of the oldest employee.
@@ -72,7 +73,7 @@ SELECT
 FROM
     employees
 WHERE
-    birth_date LIKE '____-12-25'
+    birth_date LIKE '%-12-25'
         AND (hire_date >= '1990-01-01'
         AND hire_date < '2000-01-01')
 ORDER BY birth_date ASC , hire_date DESC; 
