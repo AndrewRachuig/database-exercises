@@ -126,8 +126,9 @@ FROM
     albums
 WHERE
     genre = 'Rock'
-		or genre LIKE 'Rock%'
-        or genre LIKE '%, Rock%';
+		or genre LIKE 'Rock,%'
+        or genre LIKE '%, Rock, %'
+        or genre LIKE '%, Rock';
 -- Here it's appropriately limited.        
         
 -- Why do these query results not include albums with a genre of "Hard rock" or "Progressive rock"?
