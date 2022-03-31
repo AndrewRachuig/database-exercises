@@ -95,18 +95,41 @@ WHERE
 
 
 -- f. All the albums with a genre of "Rock". 
+
 SELECT 
     name, genre
 FROM
     albums
 WHERE
-    genre LIKE '%Rock%'
-        AND genre NOT LIKE '%Hard rock%'
-        AND genre NOT LIKE '%Alternative rock%'
-        AND genre NOT LIKE '%Progressive rock%'
-        AND genre NOT LIKE '%Soft rock%'
-        AND genre NOT LIKE '%Folk rock%'
-        or genre LIKE "Rock, Soft Rock%";
+    genre = 'Rock'; 
+-- This is too constraining.
+
+
+SELECT
+	name, genre
+FROM
+	albums;
+-- We see here there are multiple others which have 'Rock' in the genre but alongside other genres.
+
+
+SELECT 
+    name, genre
+FROM
+    albums
+WHERE
+    genre LIKE '%Rock%';
+-- Now the results are too broad.
+        
+SELECT 
+    name, genre
+FROM
+    albums
+WHERE
+    genre = 'Rock'
+		or genre LIKE 'Rock%'
+        or genre LIKE '%, Rock%';
+-- Here it's appropriately limited.        
+        
 -- Why do these query results not include albums with a genre of "Hard rock" or "Progressive rock"?
 
 /* I'm assuming you mean why does the query 
@@ -120,5 +143,3 @@ WHERE
 
 not return those rows with albums of genre "Hard rock" or "Progressive rock", 
 that would be because they don't match the searched for term "Rock" exactly, but my query doesn't contain them as I exclude them explicitly. */
-
-Select name, genre FROM albums WHERE genre LIKE "%Rock%";
