@@ -12,7 +12,7 @@ WHERE
 -- 3. Convert the names produced in your last query to all uppercase.
 
 SELECT 
-    UPPER(CONCAT(first_name, ' ', last_name)) AS full_name
+    UPPER(CONCAT(first_name, ' ', last_name)) AS 'full_name'
 FROM
     employees
 WHERE
@@ -36,7 +36,8 @@ WHERE
 SELECT 
     MAX(salary), MIN(salary)
 FROM
-    salaries;
+    salaries
+    WHERE to_date > NOW();
 
 -- Max salary is 158220 and min salary is 38623
 
