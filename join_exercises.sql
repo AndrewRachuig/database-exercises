@@ -1,7 +1,6 @@
 -- JOIN Example Database
 
 use join_example_db;
-show tables;
 
 -- 1. Use the join_example_db. Select all the records from both the users and roles tables.
 
@@ -60,7 +59,7 @@ FROM
         JOIN
     employees AS e ON dm.emp_no = e.emp_no
         JOIN
-    departments AS d ON d.dept_no = dm.dept_no
+    departments AS d using(dept_no)
 WHERE
     dm.to_date > NOW()
 ORDER BY d.dept_name;
@@ -93,8 +92,8 @@ FROM
     departments AS d ON d.dept_no = de.dept_no
 WHERE
     d.dept_name = 'Customer Service'
-        AND de.to_date > NOW()
-        AND t.to_date > NOW()
+        AND de.to_date > CURDATE()
+        AND t.to_date > CURDATE()
 GROUP BY Title
 ORDER BY Title;
 
@@ -120,7 +119,7 @@ ORDER BY d.dept_name;
 -- 6. Find the number of current employees in each department.
 
 SELECT 
-    d.dept_no, d.dept_name, COUNT(*)
+    d.dept_no, d.dept_name, COUNT(*) as number_of_employees
 FROM
     departments AS d
         JOIN
@@ -144,7 +143,7 @@ FROM
         JOIN
     salaries AS s ON s.emp_no = e.emp_no
 WHERE
-    s.to_date > NOW()
+    s.to_date > NOW() and de.to_date > NOW()
 GROUP BY d.dept_no
 ORDER BY avg_salary DESC
 LIMIT 1;
@@ -162,7 +161,7 @@ FROM
     JOIN dept_emp AS de ON de.emp_no = e.emp_no
     JOIN departments AS d ON d.dept_no = de.dept_no
     WHERE
-        d.dept_name = 'Marketing'
+        d.dept_name = 'Marketing' and s.to_date > NOW()
     GROUP BY e.first_name , e.last_name
     ORDER BY highest_salary DESC
     LIMIT 1) AS inner_select;
@@ -193,8 +192,26 @@ LIMIT 1;
 
 
 -- 10. Determine the average salary for each department. Use all salary information and round your results.
+
 SELECT 
-    d.dept_name, AVG(s.salary) AS avg_salary
+    d.dept_name, round(AVG(s.salary)) AS avg_salary
+FROM
+    departments AS d
+        JOIN
+    dept_emp AS de ON d.dept_no = de.dept_no
+        JOIN
+    employees AS e ON e.emp_no = de.emp_no
+        JOIN
+    salaries AS s ON s.emp_no = e.emp_no
+    GROUP BY d.dept_no;
+
+-- This is a solution that is seemingly more complex with more steps but it works and returns results in around half the time
+    
+SELECT d_name, round(avg(salary)) as avg_salary 
+FROM(
+
+SELECT 
+    d.dept_name as d_name, s.salary as salary
 FROM
     employees AS e
         JOIN
@@ -203,8 +220,62 @@ FROM
     dept_emp AS de ON de.emp_no = e.emp_no
         JOIN
     departments AS d ON d.dept_no = de.dept_no
-GROUP BY d.dept_name;
 
-    
+    ) inner_select
+    GROUP BY d_name
+    ORDER BY avg_salary DESC
+;
 
+-- 11. Bonus Find the names of all current employees, their department name, and their current manager's name.
+
+SELECT 
+    CONCAT(self.first_name, ' ', self.last_name) as 'full_name',
+    d.dept_name as department_name,
+--     dm.emp_no AS 'department_manager_number',
+    CONCAT(manager.first_name, ' ', manager.last_name) as 'manager_name'
+FROM
+    employees AS self 
+        JOIN
+    dept_emp AS de ON self.emp_no = de.emp_no
+        JOIN
+    departments AS d ON d.dept_no = de.dept_no
+        JOIN
+    dept_manager AS dm ON d.dept_no = dm.dept_no
+		JOIN
+	employees AS manager ON manager.emp_no = dm.emp_no
+WHERE de.to_date > NOW() AND dm.to_date > NOW()
+ORDER BY full_name
+;
     
+     
+-- 12. Bonus Who is the highest paid employee within each department.
+
+SELECT 
+    salary, 
+    dept_name, 
+    CONCAT(first_name, ' ', last_name) as full_name
+FROM
+    employees e
+        JOIN
+    salaries sa USING (emp_no)
+        JOIN
+    dept_emp USING (emp_no)
+        JOIN
+    departments USING (dept_no)
+WHERE
+    (salary, dept_name) 
+    IN (
+		SELECT 
+            MAX(salary), 
+            dept_name
+        FROM
+            salaries s
+                JOIN
+            employees e USING (emp_no)
+                JOIN
+            dept_emp de USING (emp_no)
+                JOIN
+            departments USING (dept_no)
+        WHERE
+            s.to_date > NOW() AND de.to_date > NOW()
+        GROUP BY dept_name);
