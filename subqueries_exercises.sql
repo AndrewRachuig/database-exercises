@@ -5,13 +5,17 @@ SELECT
     *
 FROM
     employees
+JOIN 
+	dept_emp USING (emp_no)
 WHERE
     hire_date = (SELECT 
             hire_date
         FROM
             employees
         WHERE
-            emp_no = 101010);
+            emp_no = 101010)
+AND to_date > NOW()
+;
             
 -- 2. Find all the titles ever held by all current employees with the first name Aamod.
 SELECT DISTINCT
@@ -38,7 +42,8 @@ FROM
     GROUP BY emp_no) AS inner_query
 WHERE
     last_working_date < NOW();
--- 59900 employees are no longer working for the company.alter
+-- 59900 employees are no longer working for the company
+
 
 -- 4.Find all the current department managers that are female. List their names in a comment in your code.
 
@@ -48,31 +53,23 @@ FROM
     employees
         JOIN
     (SELECT 
-        emp_no
+        emp_no, to_date
     FROM
         dept_manager) AS managers on managers.emp_no = employees.emp_no
 WHERE
-    employees.gender = 'F';
+    employees.gender = 'F' AND
+    managers.to_date > NOW();
     
 -- 'Isamu Legleitner'
--- 'Shirish Ossenbruggen'
 -- 'Karsten Sigstam'
--- 'Krassimir Wegerle'
--- 'Rosine Cools'
 -- 'Leon DasSarma'
--- 'Peternela Onuegbe'
--- 'Rutger Hofmeyr'
--- 'Sanjoy Quadeer'
 -- 'Hilary Kambil'
--- 'Tonny Butterworth'
--- 'Marjo Giarratana'
--- 'Xiaobin Spinelli'
 
 
 -- 5. Find all the employees who currently have a higher salary than the companies overall, historical average salary.
 
 SELECT DISTINCT
-    CONCAT(first_name, ' ', last_name)
+    CONCAT(first_name, ' ', last_name), s.salary
 FROM
     employees AS e
         JOIN
@@ -85,12 +82,40 @@ WHERE
             AND s.to_date > NOW();
             
 -- 6. How many current salaries are within 1 standard deviation of the current highest salary?
-SELECT MAX(salary) FROM salaries;
-
-SELECT STDDEV(salary) FROM salaries;
 
 SELECT 
     COUNT(salary)
+FROM
+    salaries
+WHERE
+    salary > (	
+				(SELECT 
+					MAX(salary)
+				FROM
+					salaries
+				WHERE salaries.to_date > NOW()
+				) - 
+				(SELECT 
+					STDDEV(salary)
+				FROM
+					salaries 
+				WHERE salaries.to_date > NOW()
+				)
+            )
+and salaries.to_date > NOW();
+            
+
+-- 83 salaries are within 1 SD of the max salary
+
+
+SELECT 
+    COUNT(salary) * 100 / (
+		SELECT 
+            COUNT(*)
+        FROM
+            salaries
+        WHERE
+            salaries.to_date > NOW())
 FROM
     salaries
 WHERE
@@ -100,9 +125,12 @@ WHERE
             salaries) - (SELECT 
             STDDEV(salary)
         FROM
-            salaries));
-            
--- 211 salaries are within 1 SD of the max salary
+            salaries
+        WHERE
+            salaries.to_date > NOW()))
+        AND salaries.to_date > NOW();
+
+-- This is 3.46%  of all current salaries
 
 -- BONUS
 -- 1. Find all the department names that currently have female managers.
