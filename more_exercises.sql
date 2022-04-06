@@ -76,7 +76,70 @@ SELECT film_id, title, description, length FROM film WHERE length BETWEEN '100' 
 
 -- 6. LIKE operator
 -- a. Select the following columns from the film table for rows where the description begins with "A Thoughtful".
+SELECT * FROM film WHERE description RLIKE '^A Thoughtful';
 
 -- b. Select the following columns from the film table for rows where the description ends with the word "Boat".
+SELECT * FROM film WHERE description LIKE '%Boat';
+
 -- c. Select the following columns from the film table where the description contains the word "Database" and the length of the film is greater than 3 hours.
+SELECT * FROM film WHERE description LIKE '%Database%';
+
+
+
+-- 7. LIMIT Operator
+-- a. Select all columns from the payment table and only include the first 20 rows.
+SELECT * FROM payment LIMIT 20;
+
+-- b. Select the payment date and amount columns from the payment table for rows where the payment amount is greater than 5, and only select rows whose zero-based index in the result set is between 1000-2000.
+SELECT payment_date, amount FROM payment WHERE amount > 5 LIMIT 1000 OFFSET 1000;
+
+-- c. Select all columns from the customer table, limiting results to those where the zero-based index is between 101-200.
+SELECT * FROM customer LIMIT 100 OFFSET 100;
+
+
+
+-- 8. ORDER BY statement
+-- a. Select all columns from the film table and order rows by the length field in ascending order.
+SELECT * FROM film ORDER BY length ASC;
+
+-- b. Select all distinct ratings from the film table ordered by rating in descending order.
+SELECT DISTINCT rating FROM film ORDER BY rating DESC;
+
+-- c. Select the payment date and amount columns from the payment table for the first 20 payments ordered by payment amount in descending order.
+SELECT payment_date, amount FROM payment ORDER BY amount DESC LIMIT 20;
+
+-- d. Select the title, description, special features, length, and rental duration columns from the film table for the first 10 films with behind the scenes footage under 2 hours in length and a rental duration between 5 and 7 days, ordered by length in descending order.
+SELECT 
+    title,
+    description,
+    special_features,
+    length,
+    rental_duration
+FROM
+    film
+WHERE
+    special_features LIKE '%Behind the Scenes%'
+        AND length < 120
+        AND rental_duration BETWEEN 5 AND 7
+ORDER BY length DESC
+LIMIT 10;
+
+
+
+-- 9. JOINS
+-- a. Select customer first_name/last_name and actor first_name/last_name columns from performing a left join between the customer and actor column on the last_name column in each table. (i.e. customer.last_name = actor.last_name)
+-- 		Label customer first_name/last_name columns as customer_first_name/customer_last_name
+-- 		Label actor first_name/last_name columns in a similar fashion.
+-- 		returns correct number of records: 620
+-- b. Select the customer first_name/last_name and actor first_name/last_name columns from performing a /right join between the customer and actor column on the last_name column in each table. (i.e. customer.last_name = actor.last_name)
+-- 		returns correct number of records: 200
+-- c. Select the customer first_name/last_name and actor first_name/last_name columns from performing an inner join between the customer and actor column on the last_name column in each table. (i.e. customer.last_name = actor.last_name)
+-- 		returns correct number of records: 43
+-- d. Select the city name and country name columns from the city table, performing a left join with the country table to get the country name column.
+-- 		Returns correct records: 600
+-- e. Select the title, description, release year, and language name columns from the film table, performing a left join with the language table to get the "language" column.
+-- 		Label the language.name column as "language"
+-- 		Returns 1000 rows
+-- f. Select the first_name, last_name, address, address2, city name, district, and postal code columns from the staff table, performing 2 left joins with the address table then the city table to get the address and city related columns.
+-- 		returns correct number of rows: 2
 

@@ -1,7 +1,12 @@
 use employees;
 
 -- 1. Write a query that returns all employees, their department number, their start date, their end date, and a new column 'is_current_employee' that is a 1 if the employee is still with the company and 0 if not.
-SELECT CONCAT(first_name, ' ', last_name) as full_name, dept_no, hire_date as start_date, to_date, to_date = '9999-01-01' AS is_current_employee
+SELECT 
+	CONCAT(first_name, ' ', last_name) as full_name, 
+	dept_no, 
+    hire_date as start_date, 
+    to_date as end_date, 
+    to_date = '9999-01-01' AS is_current_employee
 FROM
 employees
 join dept_emp USING (emp_no)
@@ -27,7 +32,7 @@ FROM
 -- 3. How many employees (current or previous) were born in each decade?
 
 USE employees;
-SELECT * FROM employees;
+-- Check for earliest and latest birthdates to determine was decades I need to include below.
 SELECT Max(birth_date) FROM employees;
 SELECT MIN(birth_date) FROM employees;
 
@@ -49,8 +54,10 @@ FROM employees
 GROUP BY decade;
 
 -- 4. What is the current average salary for each of the following department groups: R&D, Sales & Marketing, Prod & QM, Finance & HR, Customer Service?
+-- Checks for the current department names.
 SELECT dept_name FROM departments;
 
+-- Main query
 SELECT CASE
 	WHEN dept_name IN ('Research', 'Development') THEN 'R&D'
     WHEN dept_name IN ('Sales', 'Marketing') THEN 'Sales & Marketing'
@@ -63,4 +70,21 @@ FROM departments
 JOIN dept_emp USING(dept_no)
 JOIN salaries USING(emp_no)
 WHERE salaries.to_date > NOW()
-GROUP BY dept_group;
+GROUP BY dept_group
+ORDER BY dept_group;
+
+-- Slightly different results when using the following slightly different query:
+SELECT CASE
+	WHEN dept_name IN ('Research', 'Development') THEN 'R&D'
+    WHEN dept_name IN ('Sales', 'Marketing') THEN 'Sales & Marketing'
+    WHEN dept_name IN ('Production', 'Quality Management') THEN 'Prod & QM'
+    WHEN dept_name IN ('Finance', 'Human Resources') THEN 'Finance & HR'
+    ELSE dept_name
+    END AS dept_group,
+    avg(salary)
+FROM departments
+JOIN dept_emp USING(dept_no)
+JOIN salaries USING(emp_no)
+WHERE salaries.to_date > NOW() AND dept_emp.to_date > NOW()
+GROUP BY dept_group
+ORDER BY dept_group;
