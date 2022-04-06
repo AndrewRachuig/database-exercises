@@ -14,7 +14,7 @@ describe employees_with_departments;
 
 -- a. Add a column named full_name to this table. It should be a VARCHAR whose length is the sum of the lengths of the first name and last name columns
 ALTER TABLE employees_with_departments 
-ADD full_name VARCHAR(30);
+ADD full_name VARCHAR(31);
 
 -- b. Update the table so that full name column contains the correct data
 UPDATE employees_with_departments
@@ -59,18 +59,30 @@ GROUP BY dept_name;
 
 USE jemison_1747;
 
-Alter TABLE department_pay ADD COLUMN historical_avg_pay decimal(7,2);
+Alter TABLE department_pay ADD COLUMN historical_avg_pay decimal(7,2), ADD COLUMN historical_stddev varchar(10);
+SELECT * FROM department_pay;
 
-UPDATE department_pay SET historical_avg_pay = (SELECT round(AVG(salary), 2)
-FROM employees.salaries);
+UPDATE department_pay 
+SET 
+    historical_avg_pay = (SELECT 
+            ROUND(avg(salary), 2)
+        FROM
+            employees.salaries),
+    historical_stddev = (SELECT 
+            ROUND(std(salary), 2)
+        FROM
+            employees.salaries);
 
--- Answer of comparison between current avg by per department and the historical company avg
-SELECT *, (current_avg_salary - historical_avg_pay) as difference FROM department_pay ORDER BY dept_name;
+SELECT 
+    dept_name, current_avg_salary, historical_avg_pay, (current_avg_salary - historical_avg_pay) AS difference_in_dollars, round(((current_avg_salary - historical_avg_pay) / historical_stddev), 3) as zscore
+FROM
+    department_pay
+ORDER BY dept_name;
 
 
 -- In terms of salary, what is the best department right now to work for?
 SELECT 
-    *, (current_avg_salary - historical_avg_pay) AS difference
+    dept_name, current_avg_salary, historical_avg_pay, (current_avg_salary - historical_avg_pay) AS difference_in_dollars, round(((current_avg_salary - historical_avg_pay) / historical_stddev), 3) as zscore
 FROM
     department_pay
 ORDER BY current_avg_salary DESC
@@ -78,7 +90,7 @@ LIMIT 1;
 
 --  The worst?
 SELECT 
-    *, (current_avg_salary - historical_avg_pay) AS difference
+    dept_name, current_avg_salary, historical_avg_pay, (current_avg_salary - historical_avg_pay) AS difference_in_dollars, round(((current_avg_salary - historical_avg_pay) / historical_stddev), 3) as zscore
 FROM
     department_pay
 ORDER BY current_avg_salary ASC
