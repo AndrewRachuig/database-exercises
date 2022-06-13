@@ -128,6 +128,7 @@ LIMIT 10;
 
 -- 9. JOINS
 -- a. Select customer first_name/last_name and actor first_name/last_name columns from performing a left join between the customer and actor column on the last_name column in each table. (i.e. customer.last_name = actor.last_name)
+
 -- 		Label customer first_name/last_name columns as customer_first_name/customer_last_name
 -- 		Label actor first_name/last_name columns in a similar fashion.
 -- 		returns correct number of records: 620
